@@ -14,6 +14,9 @@ Every deliberate shortcut in this kit. Each has a matching "// ponytail:" commen
 | Patrol stub only | No E2E coverage on device | Patrol configured per patrol_test/README.md | Release gate, or interviewer asks for E2E |
 | Marionette debug-only | Release builds cannot be driven by the agent; web builds are not covered | n/a -- keep the guard | Shipping release + need to drive it |
 | iOS simulator only | Android not verified | Add Android target and emulator run | Android is in scope |
+| Opening is web-only (dart:js_interop window.open) | On iOS the Open button only counts a click; pasting sho.rt URLs in a real browser fails because sho.rt has no DNS | url_launcher (native bridge, out of kit scope) or a real redirect server | A real backend exists, or a native opener gets approved |
 | In-memory backend (no network, no persistence) | Links vanish on restart; no real redirects | Real HTTP data source behind ShortLinkRemoteDataSource | A real server exists (docs/adr/0001-in-process-backend.md) |
 | No auth, users, expiry, rate limit, URL reachability check | Anyone can create unlimited links, even dead URLs | Auth token + server-side limits + link checker | Product needs accounts or abuse protection |
 | Clipboard only (no browser open of the long URL) | Open only counts a click | url_launcher to open the long URL | Real redirect behaviour is required |
+| Redirect server is stdlib Python with a JSON file store | Single process, no auth, no rate limit, links lost if the state file is deleted | A real service and database behind the same HTTP API | More than one user or more than one machine |
+| Short links live on the Tailscale host name | Host name is long; links only as good as the Funnel | A short custom domain pointed at the server | A domain is available |

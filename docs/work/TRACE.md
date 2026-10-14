@@ -33,3 +33,19 @@ Append-only narration log. Newest at the bottom.
 - DECISION: added marionette_flutter with kDebugMode guard in main.dart (brief authorizes install if verifiable by debug run); drove the app over mcporter keep-alive daemon, not one-shot calls.
 - EVIDENCE: enter_text urlField + tap shorten -> shortLinks.latestResult with https://sho.rt/x90HETg and tile x90HETg, field cleared; flutter analyze No issues found.
 - RISK: extra dependency to remove if interviewer repo forbids it (NEXT.md row).
+
+## 2026-10-14 - Open goes to the long URL
+
+- INTENT: user reported the short link does not open the original; sho.rt has no DNS so browsers can never resolve it.
+- LOOKING: Safari error cannot find server sho.rt; Open only counted a click.
+- DECISION: Open affordances open the long URL via a UrlOpener seam (dart:js_interop on web through a conditional import; stub on iOS). Rejected url_launcher (native bridge, out of scope) and opening sho.rt directly (unresolvable).
+- EVIDENCE: window.open captured with the long URL on the public site; tile shows 1 click after open; 2 new widget tests cover open and short-url-text tap; analyze clean.
+- RISK: on iOS Open counts only until a real redirect server or url_launcher is approved (SHORTCUTS.md row).
+
+## 2026-10-14 - real shortening and forwarding
+
+- INTENT: short URLs must resolve for people outside this network; the in-memory fake produced sho.rt links that no DNS can resolve.
+- LOOKING: Tailscale Funnel proxies the public host to 127.0.0.1:8877, previously a static python http.server.
+- DECISION: stdlib Python redirect server (API + 302 + static) behind the same data-source interface; HttpShortLinkBackend uses dart:js_interop fetch on web (no package). Short URL built per request from the public host or .public_base_url, never stored. Dropped /go/ to shorten links. Rejected: a custom domain (needs DNS purchase) and an http package (dependency).
+- EVIDENCE: tool/e2e_public.sh resolves the host on 1.1.1.1, shortens, and follows the 302 to the destination (200, 1 redirect); Playwright shortened plain, alias and invalid URLs in the browser.
+- RISK: the hostname is long (Tailscale name); one process, JSON file store, no auth.

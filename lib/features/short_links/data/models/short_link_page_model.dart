@@ -12,7 +12,7 @@ class ShortLinkPageModel {
               (item) => ShortLinkModel.fromJson(item as Map<String, dynamic>),
             )
             .toList(),
-        nextCursor: json['next_cursor'] as String?,
+        nextCursor: json['next_cursor']?.toString(),
       );
 
   final List<ShortLinkModel> items;

@@ -1,3 +1,4 @@
+// coverage:platform-only (VM tests cannot run this platform arm)
 // Web-only platform code, selected on web builds (dart.library.html).
 // Uses dart:js_interop only (SDK libraries), so no extra package is needed.
 import 'dart:js_interop';

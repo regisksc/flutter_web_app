@@ -26,3 +26,14 @@ You should see: "No issues found!" from analyze, all tests green, and the articl
 ## Use case: Bitly-style shortener
 
 lib/features/short_links is the product feature: paste a URL, get a short URL in a result card, type again. The backend is in-process (docs/adr/0001-in-process-backend.md); spec in docs/specs/short-links.md.
+
+## Run the real shortener (web)
+
+```bash
+echo https://<your-funnel-host> > .public_base_url   # pins the host used in short URLs (gitignored)
+tool/watch_web.sh &                                  # rebuilds build/web on every lib/ change
+python3 tool/redirect_server.py                      # API + redirects + static app on :8877
+tool/e2e_public.sh                                   # proves DNS, shortening and forwarding from outside
+```
+
+Short URLs look like `https://<host>/<code>` and answer with a 302 to the long URL. The macOS launchd agent in `tool/com.regis.flutter-redirect.plist` keeps the server alive.

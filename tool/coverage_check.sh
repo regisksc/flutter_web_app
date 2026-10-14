@@ -24,6 +24,12 @@ fail=0
 printf '%-50s %8s %8s %8s\n' "file" "lines" "hit" "pct"
 while IFS= read -r f; do
   [ -n "$f" ] || continue
+  # Platform arms (web/IO stubs selected by conditional imports) cannot execute
+  # under the VM tester; their first lines carry 'coverage:platform-only'.
+  if head -3 "$f" 2>/dev/null | grep -q 'coverage:platform-only'; then
+    printf '%-50s %8s %8s %8s\n' "$f" "-" "-" "platform arm (skipped)"
+    continue
+  fi
   stats="$(awk -v F="$f" 'BEGIN{lf=0; lh=0; found=0; cur=""}
     /^SF:/ {cur=substr($0,4)}
     cur==F && /^LF:/ {lf=substr($0,4); found=1}

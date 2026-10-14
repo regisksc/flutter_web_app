@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
+
 import 'package:flutter_web_app/core/flags/feature_flags.dart';
 import 'package:flutter_web_app/features/example/data/datasources/article_remote_data_source.dart';
 import 'package:flutter_web_app/features/example/data/repositories/article_repository_impl.dart';
 import 'package:flutter_web_app/features/example/domain/usecases/get_article_page.dart';
+import 'package:flutter_web_app/features/short_links/data/datasources/http_short_link_backend.dart';
 import 'package:flutter_web_app/features/short_links/data/datasources/in_memory_short_link_backend.dart';
 import 'package:flutter_web_app/features/short_links/data/datasources/short_link_remote_data_source.dart';
 import 'package:flutter_web_app/features/short_links/data/repositories/short_link_repository_impl.dart';
@@ -38,9 +41,11 @@ class AppDependencies {
     ShortLinkRemoteDataSource? shortLinkDataSource,
   }) {
     final source = dataSource ?? const FakeArticleRemoteDataSource();
-    final links = ShortLinkRepositoryImpl(
-      shortLinkDataSource ?? InMemoryShortLinkBackend(),
-    );
+    // The web build talks to the real redirect server; other platforms stay offline.
+    final ShortLinkRemoteDataSource linkSource =
+        shortLinkDataSource ??
+        (kIsWeb ? const HttpShortLinkBackend() : InMemoryShortLinkBackend());
+    final links = ShortLinkRepositoryImpl(linkSource);
     return AppDependencies._(
       flags: flags,
       getArticlePage: GetArticlePage(ArticleRepositoryImpl(source)),

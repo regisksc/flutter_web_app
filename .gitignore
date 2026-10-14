@@ -47,3 +47,5 @@ app.*.map.json
 graphify-out/
 coverage/
 .allow-deps
+.public_base_url
+.redirect_state.json

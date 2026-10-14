@@ -6,6 +6,7 @@ Paste a long URL, get a short URL (https://sho.rt/<code>), see it in a result ca
 
 ## Assumed constraints
 
+- Web: real server tool/redirect_server.py (ADR 0002); short URL = https://<public host>/<code>, 302 to the long URL, click counted on redirect. iOS: in-memory fake.
 - Code: 7 chars base62, generated; optional alias 3-20 chars [A-Za-z0-9_-], case-sensitive, unique; reserved: api, admin, links, health.
 - Long URL: http/https, host required, max 2048 chars. Same long URL without alias creates a NEW link (like Bitly).
 - List: newest first, cursor = offset string, page size 10. Open = resolve + click count +1.
@@ -38,7 +39,7 @@ abstract interface class ShortLinkRemoteDataSource { // JSON maps; throws Valida
 - [x] Bad URL or alias gives ValidationFailure without hitting the repository (rules + CreateShortLink tests).
 - [x] Taken alias gives ConflictFailure; unknown code gives NotFoundFailure (backend + repository tests).
 - [x] Shorten shows the result card and clears the URL field so the user can type again (test/app/short_links_flow_test.dart).
-- [x] Open increments the click count (bloc, backend and flow tests).
+- [x] Open (button or tapping the short URL text) opens the long URL and increments the click count: browser tab on web; click only on iOS until a native opener is allowed.
 - [x] List is newest first with cursor pagination and load more (backend and bloc tests).
 
 ## Out of scope

@@ -7,7 +7,8 @@ class ShortLink extends Equatable {
     required this.longUrl,
     required this.createdAt,
     required this.clickCount,
-  });
+    String? shortUrl,
+  }) : _shortUrl = shortUrl;
 
   /// Case-sensitive code used in the short URL.
   final String code;
@@ -18,11 +19,14 @@ class ShortLink extends Equatable {
   /// When the link was created; drives newest-first ordering.
   final DateTime createdAt;
 
-  /// Number of times the link was opened (simulated redirect hits).
+  /// Number of times the link was opened (redirect hits).
   final int clickCount;
 
-  /// Public short URL, for example https://sho.rt/abc1234.
-  String get shortUrl => 'https://sho.rt/$code';
+  /// Short URL exactly as the backend built it; null for the offline fake.
+  final String? _shortUrl;
+
+  /// Public short URL: the backend's own (real host) or the offline placeholder.
+  String get shortUrl => _shortUrl ?? 'https://sho.rt/$code';
 
   /// Copy with a new click count; used when a link is opened.
   ShortLink copyWith({int? clickCount}) => ShortLink(
@@ -30,8 +34,9 @@ class ShortLink extends Equatable {
     longUrl: longUrl,
     createdAt: createdAt,
     clickCount: clickCount ?? this.clickCount,
+    shortUrl: _shortUrl,
   );
 
   @override
-  List<Object?> get props => [code, longUrl, createdAt, clickCount];
+  List<Object?> get props => [code, longUrl, createdAt, clickCount, _shortUrl];
 }

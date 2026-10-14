@@ -7,14 +7,24 @@ class ShortLinkModel {
     required this.longUrl,
     required this.createdAt,
     required this.clickCount,
+    this.shortUrl,
   });
 
-  factory ShortLinkModel.fromJson(Map<String, dynamic> json) => ShortLinkModel(
-    code: json['code'] as String,
-    longUrl: json['long_url'] as String,
-    createdAt: DateTime.parse(json['created_at'] as String),
-    clickCount: json['click_count'] as int,
-  );
+  /// Accepts both shapes: the in-process fake (ISO time, click_count) and the
+  /// HTTP server (epoch seconds, clicks, short_url).
+  factory ShortLinkModel.fromJson(Map<String, dynamic> json) {
+    final when = json['created_at'];
+    final createdAt = when is String
+        ? DateTime.parse(when)
+        : DateTime.fromMillisecondsSinceEpoch(((when as num) * 1000).round());
+    return ShortLinkModel(
+      code: json['code'] as String,
+      longUrl: json['long_url'] as String,
+      createdAt: createdAt,
+      clickCount: (json['click_count'] ?? json['clicks'] ?? 0) as int,
+      shortUrl: json['short_url'] as String?,
+    );
+  }
 
   factory ShortLinkModel.fromEntity(ShortLink link) => ShortLinkModel(
     code: link.code,
@@ -28,6 +38,9 @@ class ShortLinkModel {
   final DateTime createdAt;
   final int clickCount;
 
+  /// Short URL exactly as the backend built it; null in the offline fake.
+  final String? shortUrl;
+
   Map<String, dynamic> toJson() => {
     'code': code,
     'long_url': longUrl,
@@ -40,5 +53,6 @@ class ShortLinkModel {
     longUrl: longUrl,
     createdAt: createdAt,
     clickCount: clickCount,
+    shortUrl: shortUrl,
   );
 }
