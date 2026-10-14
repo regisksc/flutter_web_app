@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +11,25 @@ import 'package:flutter_web_app/features/short_links/presentation/bloc/short_lin
 import 'package:flutter_web_app/features/short_links/presentation/bloc/short_links_state.dart';
 import 'package:flutter_web_app/features/short_links/presentation/view/short_links_view.dart';
 
+/// Passes when at most [tolerance] of the pixels differ. Linux CI anti-aliases text a few pixels
+/// differently from macOS; a real layout change is far above 0.1%.
+class _TolerantComparator extends LocalFileComparator {
+  _TolerantComparator(super.testFile, this.tolerance);
+
+  final double tolerance;
+
+  @override
+  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
+    final result = await GoldenFileComparator.compareLists(
+      imageBytes,
+      await getGoldenBytes(golden),
+    );
+    if (result.passed || result.diffPercent <= tolerance) return true;
+    final error = await generateFailureOutput(result, golden, basedir);
+    throw FlutterError(error);
+  }
+}
+
 class _MockShortLinksBloc extends MockBloc<ShortLinksEvent, ShortLinksState>
     implements ShortLinksBloc {}
 
@@ -18,6 +39,13 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+
+    final previous = goldenFileComparator as LocalFileComparator;
+    goldenFileComparator = _TolerantComparator(
+      previous.basedir.resolve('short_links_golden_test.dart'),
+      0.001,
+    );
+    addTearDown(() => goldenFileComparator = previous);
 
     final bloc = _MockShortLinksBloc();
     final state = ShortLinksData(
