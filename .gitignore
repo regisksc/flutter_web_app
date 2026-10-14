@@ -49,3 +49,4 @@ coverage/
 .allow-deps
 .public_base_url
 .redirect_state.json
+.keep_serving_until
