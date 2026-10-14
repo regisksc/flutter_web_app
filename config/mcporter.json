@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "patrol_mcp": {
+      "command": "dart",
+      "args": ["pub", "global", "run", "patrol_mcp"],
+      "env": { "PROJECT_ROOT": "/Users/regiskian/Git/learning/interview-prep/Outsmart/flutter_web_app" }
+    },
+    "marionette_mcp": {
+      "command": "/Users/regiskian/.pub-cache/bin/marionette_mcp",
+      "lifecycle": "keep-alive",
+      "env": { "PROJECT_ROOT": "/Users/regiskian/Git/learning/interview-prep/Outsmart/flutter_web_app" }
+    }
+  }
+}

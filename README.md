@@ -1,17 +1,28 @@
-# flutter_web_app
+# Outsmart Flutter interview kit
 
-A new Flutter project.
+A small Flutter app that shows how to build a feature fast, cleanly, and test-first: clean architecture, feature-first folders, BLoC, and a design system.
 
-## Getting Started
+It is a starter for a 1-hour live-coding round. The example feature is a cursor-paginated article list.
 
-This project is a starting point for a Flutter application.
+## 60-second quickstart
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+flutter pub get
+flutter analyze
+flutter test --coverage
+flutter run -d <ios-simulator-id>
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+You should see: "No issues found!" from analyze, all tests green, and the article list on the simulator.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Where to look
+
+- AGENTS.md: rules and commands for agents and humans
+- CONTEXT.md: the words this codebase uses
+- SHORTCUTS.md: what was cut for speed, and the day-to-day version
+- docs/INTERVIEW_PLAYBOOK.md: how to run the round, with a "first 3 minutes" script per format
+- docs/NEW_FEATURE.md: the step list for adding a feature
+
+## Use case: Bitly-style shortener
+
+lib/features/short_links is the product feature: paste a URL, get a short URL in a result card, type again. The backend is in-process (docs/adr/0001-in-process-backend.md); spec in docs/specs/short-links.md.

@@ -1,0 +1,7 @@
+# Snippet for ~/.dsh/cordis.patch.yml. USER step: paste under the same list
+# as "- id: mcp-dart" (4-space indent), then restart DSH via the restart-dsh gate.
+    - id: hooks-claude-code
+      name: '@deepseek-ai/dsh-hooks-claude-code'
+      config:
+        configPath: /Users/regiskian/Git/learning/interview-prep/Outsmart/flutter_web_app/hooks/hooks.json
+        projectDir: /Users/regiskian/Git/learning/interview-prep/Outsmart/flutter_web_app

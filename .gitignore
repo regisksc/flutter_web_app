@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Interview kit additions
+graphify-out/
+coverage/
+.allow-deps
