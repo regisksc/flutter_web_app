@@ -20,3 +20,4 @@ Every deliberate shortcut in this kit. Each has a matching "// ponytail:" commen
 | Clipboard only (no browser open of the long URL) | Open only counts a click | url_launcher to open the long URL | Real redirect behaviour is required |
 | Redirect server is stdlib Python with a JSON file store | Single process, no auth, no rate limit, links lost if the state file is deleted | A real service and database behind the same HTTP API | More than one user or more than one machine |
 | Short links live on the Tailscale host name | Host name is long; links only as good as the Funnel | A short custom domain pointed at the server | A domain is available |
+| Short domain comes from TinyURL (free public API) in front of our server | Third-party dependency and rate limits; a TinyURL outage or policy change breaks the short link (ours keeps working) | Own short domain pointed at the server | A domain is available |

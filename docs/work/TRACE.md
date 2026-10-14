@@ -49,3 +49,11 @@ Append-only narration log. Newest at the bottom.
 - DECISION: stdlib Python redirect server (API + 302 + static) behind the same data-source interface; HttpShortLinkBackend uses dart:js_interop fetch on web (no package). Short URL built per request from the public host or .public_base_url, never stored. Dropped /go/ to shorten links. Rejected: a custom domain (needs DNS purchase) and an http package (dependency).
 - EVIDENCE: tool/e2e_public.sh resolves the host on 1.1.1.1, shortens, and follows the 302 to the destination (200, 1 redirect); Playwright shortened plain, alias and invalid URLs in the browser.
 - RISK: the hostname is long (Tailscale name); one process, JSON file store, no auth.
+
+## 2026-10-14 - short domain
+
+- INTENT: the host part of the link is too long; shorten the whole URL.
+- LOOKING: Tailscale name cannot be shortened without renaming the machine (affects other services); is.gd rejects our host; TinyURL accepts it.
+- DECISION: edge-shorten with TinyURL, keep our own URL as fallback. Rejected: renaming the Mac without approval.
+- EVIDENCE: e2e shows https://tinyurl.com/22kjq2oe, 2 redirects to the destination, 200; UI click counted once.
+- RISK: third-party dependency for the visible link.

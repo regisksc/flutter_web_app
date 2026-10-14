@@ -15,9 +15,13 @@ grep -q 'api/shorten' /tmp/e2e_bundle.js || { echo 'FAIL: served bundle is stale
 R=$($C -X POST "$BASE/api/shorten" -d '{"long_url":"https://www.iana.org/about"}')
 S=$(echo "$R" | python3 -c 'import json,sys; print(json.load(sys.stdin)["short_url"])')
 case "$S" in https://127.*|http://127.*|*localhost*) echo "FAIL: localhost short url $S"; exit 1;; esac
-case "$S" in "$BASE"/*) ;; *) echo "FAIL: short url not on public host: $S"; exit 1;; esac
-[ "${#S}" -le $(( ${#BASE} + 21 )) ] || { echo "FAIL: short url longer than host + /code: $S"; exit 1; }
+HOPS=1
+case "$S" in
+  https://tinyurl.com/*) HOPS=2 ;;   # short domain -> our server -> destination
+  "$BASE"/*) ;;                       # fallback: our own host
+  *) echo "FAIL: unexpected short url: $S"; exit 1 ;;
+esac
 OUT=$($C -L -o /dev/null -w '%{url_effective} %{http_code} %{num_redirects}' "$S")
-[ "$OUT" = 'https://www.iana.org/about 200 1' ] || { echo "FAIL: forwarding gave: $OUT"; exit 1; }
-echo "OK shortened -> $S"
-echo "OK forwarded -> https://www.iana.org/about (1 redirect, 200)"
+[ "$OUT" = "https://www.iana.org/about 200 $HOPS" ] || { echo "FAIL: forwarding gave: $OUT (want $HOPS redirects)"; exit 1; }
+echo "OK shortened -> $S (${#S} chars)"
+echo "OK forwarded -> https://www.iana.org/about ($HOPS redirects, 200)"

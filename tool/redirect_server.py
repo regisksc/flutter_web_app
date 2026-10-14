@@ -3,7 +3,7 @@
 # stdlib only. State lives in .redirect_state.json. 302 redirects count a click.
 import json, threading, time, random, string, os, re
 from urllib.parse import urlparse, parse_qs
-import http.server, socketserver
+import http.server, socketserver, urllib.request, urllib.parse
 
 PORT = int(os.environ.get('REDIRECT_PORT', '8877'))
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -48,9 +48,20 @@ def public_base(handler):
     scheme = handler.headers.get('X-Forwarded-Proto') or ('http' if local else 'https')
     return '{}://{}'.format(scheme, host)
 
+def edge_shorten(target):
+    # Hand the long public URL to a free public shortener so the link people see is short.
+    # Best effort: any failure returns None and the link keeps our own URL.
+    try:
+        url = 'https://tinyurl.com/api-create.php?url=' + urllib.parse.quote(target, safe='')
+        with urllib.request.urlopen(url, timeout=6) as resp:
+            text = resp.read().decode().strip()
+        return text if text.startswith('https://tinyurl.com/') else None
+    except Exception:
+        return None
+
 def view(link, base):
     out = {k: v for k, v in link.items() if k != 'short_url'}
-    out['short_url'] = '{}/{}'.format(base, link['code'])
+    out['short_url'] = link.get('edge_url') or '{}/{}'.format(base, link['code'])
     return out
 
 def find(pred):
@@ -147,7 +158,13 @@ class H(http.server.BaseHTTPRequestHandler):
             link = {'code': code, 'long_url': long_url, 'alias': alias, 'created_at': time.time(), 'clicks': 0}
             state['links'].append(link)
             save()
-        return self._send(200, view(link, public_base(self)))
+        base = public_base(self)
+        edge = edge_shorten('{}/{}'.format(base, link['code']))
+        if edge:
+            with LOCK:
+                link['edge_url'] = edge
+                save()
+        return self._send(200, view(link, base))
 
 load()
 socketserver.ThreadingTCPServer.allow_reuse_address = True
